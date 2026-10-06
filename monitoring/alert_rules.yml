@@ -1,0 +1,31 @@
+groups:
+  - name: autoheal
+    rules:
+      - alert: HighCPU
+        expr: rate(process_cpu_seconds_total{job="api"}[30s]) * 100 > 80
+        for: 30s
+        labels:
+          severity: warning
+          service: api
+          fault_type: cpu
+        annotations:
+          summary: "API CPU above 80%"
+
+      - alert: HighMemory
+        expr: process_resident_memory_bytes{job="api"} / app_memory_limit_bytes{job="api"} > 0.6
+        for: 15s
+        labels:
+          severity: critical
+          service: api
+          fault_type: memory
+        annotations:
+          summary: "API memory above 60% of its limit"
+
+      - alert: ContainerRestarting
+        expr: changes(process_start_time_seconds{job="api"}[2m]) >= 2
+        labels:
+          severity: critical
+          service: api
+          fault_type: crash
+        annotations:
+          summary: "API restarted 2+ times in 2 minutes"
