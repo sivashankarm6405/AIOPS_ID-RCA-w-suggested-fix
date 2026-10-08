@@ -5,6 +5,7 @@ import collector
 import context_builder
 import decision_engine
 import notifier
+import rca
 
 app = FastAPI(title="AutoHeal Lite")
 
@@ -14,7 +15,7 @@ def opened_text(inc):
         f"🚨 {inc['incident_id']} | {inc['alert_name']} | {inc['service']} | {inc['severity'].upper()}\n"
         f"{inc['summary']}\n"
         f"Started: {inc['started_at']}\n"
-        f"Collecting evidence for diagnosis..."
+        f"Investigating..."
     )
 
 
@@ -22,10 +23,11 @@ def resolved_text(inc):
     return f"✅ {inc['incident_id']} | {inc['alert_name']} resolved at {inc['resolved_at']}"
 
 
-def gather_and_brief(inc):
-    """Background job: Day 2 collects the evidence, Day 3 turns it into a brief."""
+def investigate(inc):
+    """Background job: Stage 2 collects evidence, Stage 3 builds the brief, Stage 4 diagnoses."""
     collector.collect_and_save(inc)
     context_builder.build_and_save(inc)
+    rca.rca_and_save(inc)
 
 
 @app.get("/health")
@@ -40,7 +42,7 @@ def alerts(background_tasks: BackgroundTasks, payload: dict = Body(...)):
         event, inc = decision_engine.process_alert(alert)
         if event == "opened":
             notifier.notify(opened_text(inc))
-            background_tasks.add_task(gather_and_brief, inc)  # runs after the reply is sent
+            background_tasks.add_task(investigate, inc)  # runs after the reply is sent
         elif event == "resolved":
             notifier.notify(resolved_text(inc))
         results.append({"event": event, "incident_id": inc["incident_id"] if inc else None})

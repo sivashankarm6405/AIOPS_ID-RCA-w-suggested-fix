@@ -1,0 +1,47 @@
+# The ONLY fixes AutoHeal Lite may suggest. The AI picks an ID from this list;
+# the steps below are written by a human. The AI never writes commands.
+
+restart_container:
+  title: Restart the container
+  risk: low
+  when_to_use: Memory or other resources are exhausted, or the process is stuck, and a restart would clear it
+  steps:
+    - "Run: docker restart api"
+    - "Watch memory and CPU for 2 minutes: docker stats api"
+    - "If the problem comes back, find the real cause in the code or configuration"
+
+increase_memory_limit:
+  title: Raise the container memory limit
+  risk: medium
+  when_to_use: Memory sits near the limit under normal load and there is no sign of a leak
+  steps:
+    - "Edit mem_limit in docker-compose.yml (for example 256m to 512m)"
+    - "Apply it: docker compose up -d api"
+    - "Watch memory for 10 minutes to confirm it settles"
+
+revert_recent_change:
+  title: Revert the most recent change
+  risk: medium
+  when_to_use: The problem started shortly after a configuration or deployment change
+  steps:
+    - "Open data/changes.log and find the latest change for this service"
+    - "Restore the previous value and redeploy: docker compose up -d api"
+    - "Confirm the alert clears within a few minutes"
+
+stop_fault_or_traffic:
+  title: Stop the runaway workload
+  risk: low
+  when_to_use: One job or traffic source is using the CPU and can be stopped or throttled
+  steps:
+    - "Find the busy job in the logs: docker logs api --tail 50"
+    - "Stop or throttle it (in this demo: curl http://localhost:5000/fault/stop)"
+    - "Check that CPU returns to normal"
+
+investigate_manually:
+  title: Escalate to a human
+  risk: high
+  when_to_use: The evidence is unclear, missing or conflicting
+  steps:
+    - "Read the brief and the raw evidence file for this incident"
+    - "Check the logs and recent changes yourself: docker logs api --tail 100"
+    - "Decide on a fix and, once it is understood, add it to runbooks.yml"
