@@ -103,7 +103,7 @@ How to read the brief:
 - A "container oom" event or exit code 137 means the container was killed for using too much memory.
 - High CPU while memory stays flat points to a runaway job or traffic spike.
 - Several restarts with the same error in the logs after each start points to a crash loop.
-- A change made shortly before the problem began is a strong clue.
+- - A change made shortly before the problem began is a clue, but it is the cause only if the symptoms match it. Steady growth in memory is a leak, and a restart clears it for now.
 
 Answer with JSON only, in this shape:
 {{"summary": "one sentence",

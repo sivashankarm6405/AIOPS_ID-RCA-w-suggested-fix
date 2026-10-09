@@ -1,4 +1,6 @@
 """Receives Alertmanager webhooks. Run:  uvicorn main:app --host 0.0.0.0 --port 8001"""
+import json
+
 from fastapi import BackgroundTasks, Body, FastAPI
 
 import collector
@@ -24,10 +26,12 @@ def resolved_text(inc):
 
 
 def investigate(inc):
-    """Background job: Stage 2 collects evidence, Stage 3 builds the brief, Stage 4 diagnoses."""
+    """Background job: collect evidence, build the brief, diagnose, then send the diagnosis."""
     collector.collect_and_save(inc)
     context_builder.build_and_save(inc)
-    rca.rca_and_save(inc)
+    path = rca.rca_and_save(inc)
+    result = json.loads(path.read_text()) if path else None
+    notifier.notify_diagnosis(inc, result)   # a failed investigation still sends an honest message
 
 
 @app.get("/health")

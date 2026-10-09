@@ -4,7 +4,7 @@
 restart_container:
   title: Restart the container
   risk: low
-  when_to_use: Memory or other resources are exhausted, or the process is stuck, and a restart would clear it
+  when_to_use:  Memory is steadily growing or exhausted (a leak), or the process is stuck, and a restart would clear it for now
   steps:
     - "Run: docker restart api"
     - "Watch memory and CPU for 2 minutes: docker stats api"
@@ -13,7 +13,7 @@ restart_container:
 increase_memory_limit:
   title: Raise the container memory limit
   risk: medium
-  when_to_use: Memory sits near the limit under normal load and there is no sign of a leak
+  when_to_use: Memory sits near the limit under normal load, with no steady growth and no sign of a leak
   steps:
     - "Edit mem_limit in docker-compose.yml (for example 256m to 512m)"
     - "Apply it: docker compose up -d api"
@@ -22,7 +22,7 @@ increase_memory_limit:
 revert_recent_change:
   title: Revert the most recent change
   risk: medium
-  when_to_use: The problem started shortly after a configuration or deployment change
+  when_to_use: Failures began right after a configuration or deployment change AND the logs point at that change, not at gradually growing resource use
   steps:
     - "Open data/changes.log and find the latest change for this service"
     - "Restore the previous value and redeploy: docker compose up -d api"
@@ -44,4 +44,4 @@ investigate_manually:
   steps:
     - "Read the brief and the raw evidence file for this incident"
     - "Check the logs and recent changes yourself: docker logs api --tail 100"
-    - "Decide on a fix and, once it is understood, add it to runbooks.yml"
+    - "Decide on a fix and, once it is understood, add it to runbooks.yml"at change, not at gradually growing resource use
