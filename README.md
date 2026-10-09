@@ -3,8 +3,7 @@ AIOps Incident Detection, RCA with Suggested Actions
 A project that helps make incident investigation easier. When a service
 runs into trouble, the system detects the issue, collects useful
 evidence, asks a locally running AI model to explain what may have
-happened, and sends the result as notification through telegram.
-
+happened, and sends the result as notification through Telegram.
 
 What does this project do?
 
@@ -57,33 +56,29 @@ Telegram Notifications
 
 Tech Stack
 
-Tech and Tools                          how it is used
+Tech and Tools                      How it is used
 
-Python and Flask                Run the sample application, fault
+Python and Flask                    Run the sample application, fault
 scenarios, and parts of the
 incident-handling service.
 
-Prometheus                      Collect service metrics and detect
+Prometheus                          Collect service metrics and detect
 conditions that need attention.
 
-Alertmanager                    Forward firing and resolved alerts
+Alertmanager                        Forward firing and resolved alerts
 to the Decision Engine.
 
-Docker and Docker SDK           Run the application and collect
+Docker and Docker SDK               Run the application and collect
 container logs, health information,
 restart details, and events.
 
-Python and JSON                 Process alerts and save incident
+Python and JSON                     Process alerts and save incident
 information and investigation
 results.
 
-Ollama with qwen2.5:3b        Run the local AI model that reviews
+Ollama with qwen2.5:3b            Run the local AI model that reviews
 the incident brief and suggests a
 likely cause.
-
-YAML (runbooks.yml)           Store the approved fixes, their
-risk levels, and the steps
-associated with each fix.
 
 Implementation Stages
 
@@ -165,14 +160,14 @@ Telegram Notification Flow
 
 Message                             When it is sent
 
-🚨 Incident Opened              When an alert fires.
+🚨 Incident Opened                  When an alert fires.
 
-🔎 Diagnosis                    After the AI finishes its analysis.
+🔎 Diagnosis                        After the AI finishes its analysis.
 
-⚠️ Analysis Warning             If the AI is unavailable or its
+⚠️ Analysis Warning                 If the AI is unavailable or its
 response cannot be used.
 
-✅ Resolved                     When the alert clears.
+✅ Resolved                         When the alert clears.
 
 Testing and Validation
 
